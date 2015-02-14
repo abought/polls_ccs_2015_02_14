@@ -6,16 +6,21 @@ import uuid
 
 from flask import (Flask,
                    flash,
+                   jsonify,
                    render_template,
                    redirect,
                    request,
                    url_for)
+
+from flask.ext import restful
+from flask.ext.restful import reqparse
 
 import flask_wtf
 import wtforms
 from wtforms.validators import DataRequired
 
 app = Flask(__name__)
+api = restful.Api(app)
 
 app.config["SECRET_KEY"] = "dummyValue"
 
@@ -74,19 +79,16 @@ def create_poll():
                 choices[field_val] = 0
 
         VOTE_COUNTS[uid] = choices
-        #
-        # print "Created new poll!"
-        # print "p", KNOWN_POLLS
-        # print "v", VOTE_COUNTS
+
         return redirect(url_for("poll_display", poll_id=uid))
     else:
         print "Creating a new poll"
-        return render_template('create_poll.html', form=form)
+        return render_template('poll_create.html', form=form)
 
 
 @app.route("/polls/view/<poll_id>", methods=["GET"])
 def poll_display(poll_id):
-    """"""
+    """Display the poll information in a single HTML page"""
     try:
         counts = VOTE_COUNTS[poll_id]
         title = KNOWN_POLLS[poll_id]
@@ -97,7 +99,8 @@ def poll_display(poll_id):
     # Ensure dictionary is always displayed in same order (alphabetical)
     counts = sorted(counts.items(), key=lambda x: x[0])
 
-    return render_template("display_poll.html", title=title, counts=counts)
+    return render_template("poll_display.html", title=title, counts=counts)
+
 
 @app.route("/polls/vote/<poll_id>", methods=["GET", "POST"])
 def poll_vote(poll_id):
@@ -118,9 +121,21 @@ def poll_vote(poll_id):
             return redirect(url_for("poll_display", poll_id=poll_id))
 
     # If this is an invalid form or a GET request...
-    return render_template("vote_poll.html", title=title,
+    return render_template("poll_vote.html", title=title,
                            choices=counts.keys(),
                            poll_id=poll_id)
+
+@app.route("/polls/data/<poll_id>")
+def poll_data(poll_id):
+    """Return poll data as JSON"""
+    try:
+        counts = VOTE_COUNTS[poll_id]
+        title = KNOWN_POLLS[poll_id]
+    except KeyError:
+        err = jsonify({"message": "No poll matching the given id was found"})
+        return err, 404
+
+    return jsonify(counts)
 
 if __name__ == '__main__':
     app.run(debug=True)

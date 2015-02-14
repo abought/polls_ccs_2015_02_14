@@ -6,10 +6,13 @@
     <form method="post" action="{{ url_for('poll_vote', poll_id=poll_id) }}">
 
     <ul>
-    {% for c in choices %}:
-        <li><input type="radio" name="choice" value="{{ choice }}"></li>
+    {% for c in choices %}
+        <li>
+            <input type="radio" name="choice" value="{{ c }}">{{ c }}
+        </li>
     {% endfor %}
     </ul>
+    <input type="submit">
 
     </form>
 {% endblock %}
