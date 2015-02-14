@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block page_title %}Create a new poll{% endblock %}
+
+{% block page_body %}
+<form method=post action="{{ url_for('create_poll') }}">
+    {{ form.csrf_token }}
+  <dl>
+    {{ render_field(form.title) }}
+    {{ render_field(form.choice1) }}
+    {{ render_field(form.choice2) }}
+    {{ render_field(form.choice3) }}
+    {{ render_field(form.choice4) }}
+    {{ render_field(form.choice5) }}
+  </dl>
+  <p><input type=submit>
+</form>
+{% endblock %}

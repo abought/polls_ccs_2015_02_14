@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block page_title %}Create a new poll{% endblock %}
+
+{% block page_body %}
+    <h1>List of all known polls</h1>
+    <ul>
+    {%  for url, title in polls.iteritems() %}
+        <li><a href="{{ url }}">{{ title }}</a></li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}

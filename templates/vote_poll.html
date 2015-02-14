@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_title %}Vote in {{ title }}{% endblock %}
+
+{% block page_body %}
+<h1>Vote in: {{ title }}</h1>
+    <form method="post" action="{{ url_for('poll_vote', poll_id=poll_id) }}">
+
+    <ul>
+    {% for c in choices %}:
+        <li><input type="radio" name="choice" value="{{ choice }}"></li>
+    {% endfor %}
+    </ul>
+
+    </form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block page_title %}Create a new poll{% endblock %}
+
+{% block page_body %}
+    <h1>Poll: {{ title }}</h1>
+
+    <ul>
+    {% for choice, count in counts %}
+        <li>{{ choice }}: {{ count }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
