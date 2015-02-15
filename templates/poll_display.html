@@ -9,4 +9,6 @@
         <li>{{ choice }}: {{ count }}</li>
     {% endfor %}
     </ul>
+
+    <p><a class="btn btn-primary active" href="{{ url_for("poll_vote", poll_id=poll_id) }}">Vote in this poll</a></p>
 {% endblock %}

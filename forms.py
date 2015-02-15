@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 
 class CreatePollForm(flask_wtf.Form):
     """Create a poll"""
-    title = wtforms.StringField('title', validators=[DataRequired()])
+    title = wtforms.StringField('Title', validators=[DataRequired()])
     # Poll must have at least two choices. Else it's just silly
     choice1 = wtforms.StringField('Option 1', validators=[DataRequired()])
     choice2 = wtforms.StringField('Option 2', validators=[DataRequired()])

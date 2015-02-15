@@ -3,11 +3,19 @@
 {% block page_title %}Create a new poll{% endblock %}
 
 {% block page_body %}
-    <h1>List of all known polls</h1>
+    <h2>List of all known polls</h2>
     <ul>
-    {%  for url, title in polls.iteritems() %}
-        <li><a href="{{ url }}">{{ title }}</a></li>
+    {%  for uid, title in polls.iteritems() %}
+        <li>{{ title }}
+            (<a href="{{ url_for("poll_display", poll_id=uid) }}">View</a> |
+            <a href="{{ url_for("poll_vote", poll_id=uid) }}">Vote</a> |
+            <a href="{{ url_for("poll_data", poll_id=uid) }}">API data</a>)
+        </li>
     {% endfor %}
     </ul>
+
+
+    <h2>Other options</h2>
+    <p><a href="{{ url_for("create_poll") }}">Create new poll</a>
 
 {% endblock %}

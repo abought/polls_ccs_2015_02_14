@@ -20,10 +20,8 @@ def list_polls():
     """
     pd = Poll()
     polls = pd.get_all_poll_titles()
-    # Template expects {url:title} dict
-    polls = {url_for("poll_display", poll_id=uid): title
-             for uid, title in polls.items()}
 
+    # Template expects {url:title} dict
     return render_template('polls_list.html', polls=polls)
 
 
@@ -65,6 +63,7 @@ def poll_display(poll_id):
     counts = sorted(data["votes"].items(), key=lambda x: x[0])
 
     return render_template("poll_display.html",
+                           poll_id=poll_id,
                            title=data["title"], counts=counts)
 
 
