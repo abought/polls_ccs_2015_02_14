@@ -8,7 +8,7 @@ from flask import (flash,
                    url_for)
 
 from app import app
-from models import poll_data  # KNOWN_POLLS, VOTE_COUNTS
+from models import Poll  # KNOWN_POLLS, VOTE_COUNTS
 
 import forms
 
@@ -18,11 +18,11 @@ def list_polls():
     Display a list of all currently known polls: title and link
     Key on UID since there are no guarantees titles will be unique
     """
-
-    print "pt", poll_data, dir(poll_data)
+    pd = Poll()
+    polls = pd.get_all_poll_titles()
     # Template expects {url:title} dict
     polls = {url_for("poll_display", poll_id=uid): title
-             for uid, title in poll_data.get_all_poll_titles()}
+             for uid, title in polls.items()}
 
     return render_template('polls_list.html', polls=polls)
 
@@ -43,7 +43,8 @@ def create_poll():
             if field_val:
                 choices.append(field_val)
 
-        poll_data.make_poll(uid, form.title.data, choices)
+        pd = Poll()
+        pd.make_poll(uid, form.title.data, choices)
 
         return redirect(url_for("poll_display", poll_id=uid))
     else:
@@ -54,7 +55,8 @@ def create_poll():
 @app.route("/polls/view/<poll_id>", methods=["GET"])
 def poll_display(poll_id):
     """Display the poll information in a single HTML page"""
-    data = poll_data.get_poll_data(poll_id)
+    pd = Poll()
+    data = pd.get_poll_data(poll_id)
     if data is None:
         flash("No poll matching the given id was found")
         return redirect(url_for("list_polls"))
@@ -69,7 +71,8 @@ def poll_display(poll_id):
 @app.route("/polls/vote/<poll_id>", methods=["GET", "POST"])
 def poll_vote(poll_id):
     """Vote in a specific poll"""
-    data = poll_data.get_poll_counts()
+    pd = Poll()
+    data = pd.get_poll_data(poll_id)
     if data is None:
         flash("No poll matching the given id was found")
         return redirect(url_for("list_polls"))
@@ -79,7 +82,7 @@ def poll_vote(poll_id):
         if choice is None or choice not in data["votes"]:
             flash("You must choose a valid option")
         else:
-            poll_data.vote(poll_id, choice)
+            pd.vote(poll_id, choice)
             return redirect(url_for("poll_display", poll_id=poll_id))
 
     # If this is an invalid form or a GET request...
@@ -91,7 +94,8 @@ def poll_vote(poll_id):
 @app.route("/polls/data/<poll_id>")
 def poll_data(poll_id):
     """Return poll data as JSON"""
-    data = poll_data.get_poll_counts()
+    pd = Poll()
+    data = pd.get_poll_data(poll_id)
     if data is None:
         err = jsonify({"message": "No poll matching the given id was found"})
         return err, 404

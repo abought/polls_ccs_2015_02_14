@@ -1,8 +1,7 @@
 """Models to store and access data"""
 __author__ = 'abought'
 
-from app import redis_conn
-# TODO: Is there a way to make the connection pool more efficient?
+import redis # TODO: Is there a way to make the connection pool more efficient?
 
 
 class Poll(object):
@@ -13,23 +12,27 @@ class Poll(object):
     - An individual redis hash (one per poll)
         comprised of {choice_label: vote_count}
     """
+    def __init__(self):
+        """Connect to redis as background (keeps long-polled demo snappy)"""
+        self.redis = redis.StrictRedis(host='localhost', port=6379)
+
     def get_all_poll_titles(self):
         """Get all known polls as {uid:title}"""
-        return redis_conn.hgetall("poll_names")
+        return self.redis.hgetall("poll_names")
 
     def get_poll_data(self, uid):
         """Get vote counts for one existing poll from uid, if the poll exists"""
-        if not redis_conn.hexists("poll_names", uid):
+        if not self.redis.hexists("poll_names", uid):
             return None
 
-        #pipe = redis_conn.pipeline()
-        title = redis_conn.hget("poll_names", uid)
-        votes = redis_conn.hgetall(uid)
+        #pipe = self.redis.pipeline()
+        title = self.redis.hget("poll_names", uid)
+        votes = self.redis.hgetall(uid)
         return {"title": title, "votes": votes}
 
     def make_poll(self, uid, title, choice_list):
         """Add the specified poll information to Redis"""
-        pipe = redis_conn.pipeline()
+        pipe = self.redis.pipeline()
 
         # Add the poll name to the hash of known polls ({uid: title})
         pipe.hset("poll_names", uid, title)
@@ -43,21 +46,5 @@ class Poll(object):
 
     def vote(self, uid, choice):
         """Vote on an existing poll and return the new count"""
-        return redis_conn.hincrby(uid, choice, 1)
+        return self.redis.hincrby(uid, choice, 1)
 
-
-poll_data = Poll()
-print "pd in models mod", poll_data.get_all_poll_titles()
-
-#
-# KNOWN_POLLS = {}  # {uid: title}
-# VOTE_COUNTS = {}  # {uid: {choice:count}}
-
-
-
-# # dummy data to aid testing after reload
-# KNOWN_POLLS["dummy"] = "Sample poll"
-# VOTE_COUNTS["dummy"] = {"Parsley": 0,
-#                         "Sage": 0,
-#                         "Rosemary": 2,
-#                         "Thyme": 3}
