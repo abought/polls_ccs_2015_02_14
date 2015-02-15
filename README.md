@@ -7,3 +7,5 @@ To install dependencies:
 
 `pip install -r requirements.txt`
 
+Additionally, the machine must have Redis installed, and a Redis 
+server must be running.
