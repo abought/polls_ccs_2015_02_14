@@ -14,6 +14,7 @@ class Poll(object):
     """
     def __init__(self):
         """Connect to redis as background (keeps long-polled demo snappy)"""
+        # TODO: Does this lead to resource leak when obj destroyed?
         self.redis = redis.StrictRedis(host='localhost', port=6379)
 
     def get_all_poll_titles(self):
@@ -45,6 +46,7 @@ class Poll(object):
         return all(pipe.execute())
 
     def vote(self, uid, choice):
-        """Vote on an existing poll and return the new count"""
-        return self.redis.hincrby(uid, choice, 1)
+        """Vote on an existing poll and return the new vote counts"""
+        self.redis.hincrby(uid, choice, 1)
+        return self.get_poll_data(uid)
 

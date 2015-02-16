@@ -4,3 +4,4 @@ Flask-RESTful
 flask-debugtoolbar
 redis
 hiredis
+Flask-SocketIO

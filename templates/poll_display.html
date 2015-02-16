@@ -1,12 +1,40 @@
 {% extends "base.html" %}
-{% block page_title %}Create a new poll{% endblock %}
+{% block page_title %}Votes for poll: {{ title }}{% endblock %}
+{% block extra_head %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+<script language="JavaScript">
+  $(document).ready(function(){
+    var socket = io.connect('http://' + document.domain + ':' + location.port); // TODO: define namespace url?
+
+    socket.on("connect", function(){
+        console.log("Connected to socket");
+    });
+
+    socket.on("disconnect", function(){
+        console.log("Disconnected from socket");
+    });
+
+    socket.on("vote counts", function(data){
+        console.log("Socket sent message; event firing");
+
+      // Take the data provided and update vote counts
+        for (var k in data){
+            var count_node = document.getElementById(k);
+            count_node.innerHTML = data[k];
+        }
+    });
+
+  });
+</script>
+{% endblock %}
 
 {% block page_body %}
     <h1>Poll: {{ title }}</h1>
 
     <ul>
     {% for choice, count in counts %}
-        <li>{{ choice }}: {{ count }}</li>
+        <li>{{ choice }}: <span id="{{ choice }}">{{ count }}</span></li>
     {% endfor %}
     </ul>
 

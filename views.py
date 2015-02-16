@@ -7,7 +7,10 @@ from flask import (flash,
                    request,
                    url_for)
 
-from app import app
+from flask.ext.socketio import emit
+
+from app import (app,
+                 socketio)
 from models import Poll  # KNOWN_POLLS, VOTE_COUNTS
 
 import forms
@@ -66,6 +69,8 @@ def poll_display(poll_id):
                            poll_id=poll_id,
                            title=data["title"], counts=counts)
 
+    # TODO: Update view to use long polling or even websockets:
+    #  near real-time display of vote counts
 
 @app.route("/polls/vote/<poll_id>", methods=["GET", "POST"])
 def poll_vote(poll_id):
@@ -81,7 +86,12 @@ def poll_vote(poll_id):
         if choice is None or choice not in data["votes"]:
             flash("You must choose a valid option")
         else:
-            pd.vote(poll_id, choice)
+            new_counts = pd.vote(poll_id, choice)
+            # Send new counts to all connected websockets
+            # TODO: improve this approach and test with mult clients
+            socketio.emit('vote counts', new_counts,
+                          broadcast=True)
+
             return redirect(url_for("poll_display", poll_id=poll_id))
 
     # If this is an invalid form or a GET request...
