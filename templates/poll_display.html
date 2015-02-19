@@ -5,23 +5,24 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
 <script language="JavaScript">
   $(document).ready(function(){
-    var socket = io.connect('http://' + document.domain + ':' + location.port); // TODO: define namespace url?
+    var namespace = '/test';
+    var socket = io.connect('http://' + document.domain + ':' + location.port + namespace); // TODO: define namespace url?
 
     socket.on("connect", function(){
-        console.log("Connected to socket");
+        //console.log("Connected to socket");
     });
 
     socket.on("disconnect", function(){
-        console.log("Disconnected from socket");
+        //console.log("Disconnected from socket");
     });
 
     socket.on("vote counts", function(data){
-        console.log("Socket sent message; event firing");
+      //console.log("Socket sent message; event firing");
 
       // Take the data provided and update vote counts
-        for (var k in data){
+        for (var k in data['votes']){
             var count_node = document.getElementById(k);
-            count_node.innerHTML = data[k];
+            count_node.innerHTML = data['votes'][k];
         }
     });
 

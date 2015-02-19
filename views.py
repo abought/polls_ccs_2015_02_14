@@ -90,7 +90,7 @@ def poll_vote(poll_id):
             # Send new counts to all connected websockets
             # TODO: improve this approach and test with mult clients
             socketio.emit('vote counts', new_counts,
-                          broadcast=True)
+                          namespace='/test')
 
             return redirect(url_for("poll_display", poll_id=poll_id))
 
@@ -110,3 +110,9 @@ def poll_data(poll_id):
         return err, 404
 
     return jsonify(data)
+
+@socketio.on('connect', namespace='/test')
+def connect_socket():
+    """Socket connection seems to fail if this event is
+     undefined, even if unused. Send a dummy confirmation event for now"""
+    emit('confirmation', {'data': 'Connected'})
